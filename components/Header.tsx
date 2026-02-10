@@ -4,7 +4,6 @@ import { useAppState, useAppDispatch, useUpcomingBills } from '../context/AppCon
 import { Sun, Moon, BarChart2, Settings, Menu, X, Bot, Palette, FileDown, UploadCloud, Repeat, Gem, LoaderCircle, Bell, Eye, EyeOff, Smartphone } from 'lucide-react';
 import type { Theme, ViewMode, ModalType, ICStatus } from '../types';
 import { triggerHapticFeedback } from '../utils';
-// Fix: Added missing Button import
 import { Button } from './ui';
 
 const THEMES: { name: Theme; icon: React.ReactNode }[] = [
@@ -32,15 +31,6 @@ const ViewSwitcher = memo(({ viewMode, setViewMode }: { viewMode: ViewMode, setV
         <button onClick={() => setViewMode('business')} className={`${baseButtonClass} ${viewMode === 'business' ? activeButtonClass : inactiveButtonClass}`}>Business</button>
     </ControlGroupContainer>
 ));
-
-const SyncStatus: React.FC<{ status: ICStatus }> = ({ status }) => {
-    switch (status) {
-        case 'connecting': return <><LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> Verbinde...</>;
-        case 'connected': return <><div className="mr-2 h-2 w-2 rounded-full bg-success"></div> Verbunden</>;
-        case 'error': return <><div className="mr-2 h-2 w-2 rounded-full bg-destructive"></div> Fehler</>;
-        default: return <><Repeat className="mr-2 h-4 w-4" /> Sync (Pro)</>;
-    }
-};
 
 const NotificationBell = memo(() => {
     const { dueOrOverdueCount } = useUpcomingBills();
@@ -88,20 +78,34 @@ const Header: React.FC = () => {
         triggerHapticFeedback('light');
         dispatch({ type: 'SET_VIEW_MODE', payload: newMode });
     };
-    const openModal = (modal: ModalType) => dispatch({ type: 'OPEN_MODAL', payload: modal });
+    const openModal = (modal: ModalType) => {
+        triggerHapticFeedback('medium');
+        dispatch({ type: 'OPEN_MODAL', payload: modal });
+    };
     const togglePrivacy = () => {
         triggerHapticFeedback('medium');
         dispatch({ type: 'TOGGLE_PRIVACY_MODE' });
     };
 
     const handleInstall = async () => {
+        triggerHapticFeedback('heavy');
         if (deferredPrompt) {
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
             if (outcome === 'accepted') setDeferredPrompt(null);
         } else {
-            alert("Die App ist bereits installiert oder Ihr Browser unterstützt die Installation derzeit nicht direkt über dieses Menü.");
+            alert("Klaro ist bereits installiert oder wird direkt über Ihren Browser verwaltet.");
         }
+    };
+
+    const toggleDropdown = () => {
+        triggerHapticFeedback('light');
+        setIsDropdownOpen(!isDropdownOpen);
+    };
+
+    const toggleMenu = () => {
+        triggerHapticFeedback('light');
+        setIsMenuOpen(!isMenuOpen);
     };
 
     return (
@@ -125,22 +129,22 @@ const Header: React.FC = () => {
                             <NotificationBell />
                             <div className="relative">
                                 <button
-                                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                    onClick={toggleDropdown}
                                     className={`${baseButtonClass} ${inactiveButtonClass} flex items-center`}
                                 >
                                     <Settings className="mr-2 h-4 w-4" /> Verwaltung
                                 </button>
                                 {isDropdownOpen && (
                                     <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg py-1 glass-card ring-1 ring-black ring-opacity-5 z-20 animate-fade-in">
-                                        <button onClick={() => { openModal({type: 'MANAGE_CATEGORIES'}); setIsDropdownOpen(false); }} className="w-full text-left block px-4 py-2 text-sm text-foreground hover:bg-secondary">Kategorien</button>
-                                        <button onClick={() => { openModal({type: 'MANAGE_RECURRING'}); setIsDropdownOpen(false);}} className="w-full text-left block px-4 py-2 text-sm text-foreground hover:bg-secondary">Daueraufträge</button>
+                                        <button onClick={() => { openModal({type: 'MANAGE_CATEGORIES'}); setIsDropdownOpen(false); }} className="w-full text-left block px-4 py-3 text-sm text-foreground hover:bg-secondary">Kategorien</button>
+                                        <button onClick={() => { openModal({type: 'MANAGE_RECURRING'}); setIsDropdownOpen(false);}} className="w-full text-left block px-4 py-3 text-sm text-foreground hover:bg-secondary">Daueraufträge</button>
                                         <div className="border-t border-border my-1"></div>
                                         {deferredPrompt && (
-                                            <button onClick={() => { handleInstall(); setIsDropdownOpen(false); }} className="w-full text-left flex items-center px-4 py-2 text-sm text-primary font-bold hover:bg-secondary">
+                                            <button onClick={() => { handleInstall(); setIsDropdownOpen(false); }} className="w-full text-left flex items-center px-4 py-3 text-sm text-primary font-bold hover:bg-secondary">
                                                 <Smartphone className="mr-2 h-4 w-4" /> App installieren
                                             </button>
                                         )}
-                                        <button onClick={() => { openModal({type: 'EXPORT_IMPORT_DATA'}); setIsDropdownOpen(false);}} className="w-full text-left flex items-center px-4 py-2 text-sm text-foreground hover:bg-secondary"><UploadCloud className="mr-2 h-4 w-4" /> Export / Import</button>
+                                        <button onClick={() => { openModal({type: 'EXPORT_IMPORT_DATA'}); setIsDropdownOpen(false);}} className="w-full text-left flex items-center px-4 py-3 text-sm text-foreground hover:bg-secondary"><UploadCloud className="mr-2 h-4 w-4" /> Export / Import</button>
                                     </div>
                                 )}
                             </div>
@@ -160,7 +164,7 @@ const Header: React.FC = () => {
                     
                     <div className="md:hidden flex items-center gap-2">
                         <NotificationBell />
-                        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 rounded-md text-foreground hover:bg-secondary">
+                        <button onClick={toggleMenu} className="p-2 rounded-md text-foreground hover:bg-secondary">
                             {isMenuOpen ? <X /> : <Menu />}
                         </button>
                     </div>
@@ -170,8 +174,8 @@ const Header: React.FC = () => {
                 <div className="md:hidden glass-card p-4 space-y-4 animate-fade-in border-t border-border/10">
                     <ViewSwitcher viewMode={viewMode} setViewMode={setViewMode} />
                     <div className="grid grid-cols-2 gap-2">
-                        <Button onClick={() => openModal({type: 'ANALYSIS'})} className="text-sm py-2">Analyse</Button>
-                        <Button onClick={() => openModal({type: 'SMART_SCAN'})} className="text-sm py-2">Scanner</Button>
+                        <Button onClick={() => { setIsMenuOpen(false); openModal({type: 'ANALYSIS'}); }} className="text-sm py-2">Analyse</Button>
+                        <Button onClick={() => { setIsMenuOpen(false); openModal({type: 'SMART_SCAN'}); }} className="text-sm py-2">Scanner</Button>
                     </div>
                     <div className="flex justify-center gap-4 py-2">
                         {THEMES.map(t => (

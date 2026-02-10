@@ -17,21 +17,21 @@ export const Modal: React.FC<{ children: React.ReactNode; title: string; onClose
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in-backdrop" onClick={handleClose}>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in-backdrop bg-black/40 backdrop-blur-[2px]" onClick={handleClose}>
             <div 
-                className={`relative w-full glass-card rounded-t-[2.5rem] sm:rounded-2xl shadow-2xl ${sizeClasses[size]} animate-slide-up-sheet sm:animate-zoom-in-modal sm:mx-4 border-t sm:border border-border/20`} 
+                className={`relative w-full glass-card rounded-t-[2.5rem] sm:rounded-2xl shadow-2xl ${sizeClasses[size]} animate-slide-up-sheet sm:animate-zoom-in-modal sm:mx-4 border-t sm:border border-border/20 overflow-hidden`} 
                 onClick={e => e.stopPropagation()}
             >
                 {/* Grab Handle for UX - Visual cue that it's a pullable drawer */}
-                <div className="w-12 h-1.5 bg-border/20 rounded-full mx-auto mt-4 mb-2 sm:hidden"></div>
+                <div className="w-16 h-1.5 bg-muted/40 rounded-full mx-auto mt-3 mb-1 sm:hidden"></div>
                 
                 <div className="flex items-center justify-between p-5 border-b border-border/10">
-                    <h3 className="text-xl font-bold text-foreground">{title}</h3>
-                    <button onClick={handleClose} className="p-3 -mr-2 rounded-full hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground" aria-label="Schließen">
+                    <h3 className="text-xl font-bold text-foreground tracking-tight">{title}</h3>
+                    <button onClick={handleClose} className="p-2 -mr-2 rounded-full hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground" aria-label="Schließen">
                         <X className="h-6 w-6" />
                     </button>
                 </div>
-                <div className="p-6 max-h-[85vh] overflow-y-auto pb-safe">
+                <div className="p-6 max-h-[80vh] overflow-y-auto pb-safe">
                     {children}
                 </div>
             </div>
@@ -69,7 +69,7 @@ export const Select = React.forwardRef<HTMLSelectElement, React.SelectHTMLAttrib
 ));
 
 export const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & {variant?: 'primary' | 'secondary' | 'destructive'}> = ({children, variant = 'secondary', ...props}) => {
-    const baseClasses = "px-5 py-4 sm:py-3 rounded-xl font-bold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95 flex items-center justify-center text-base touch-manipulation focus-visible:ring-2 focus-visible:ring-primary/60 outline-none";
+    const baseClasses = "px-5 py-4 sm:py-3 rounded-xl font-bold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95 flex items-center justify-center text-base touch-manipulation focus-visible:ring-2 focus-visible:ring-primary/60 outline-none select-none";
     const variantClasses = {
         primary: "bg-primary text-primary-foreground hover:brightness-110 shadow-lg shadow-primary/20",
         secondary: "border border-border/50 bg-secondary/30 text-foreground hover:bg-secondary/60",

@@ -1,9 +1,10 @@
 
-const CACHE_NAME = 'klaro-finance-v6';
+const CACHE_NAME = 'klaro-finance-v7';
 const STATIC_ASSETS = [
   './',
   'index.html',
   'index.tsx',
+  'metadata.json',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap',
   'https://cdn.tailwindcss.com',
   'https://unpkg.com/recharts/umd/Recharts.min.js',
@@ -13,13 +14,12 @@ const STATIC_ASSETS = [
 
 const LIB_PATTERN = /^https:\/\/aistudiocdn\.com\//;
 const API_PATTERN = /^https:\/\/generativelanguage\.googleapis\.com\//;
+const ICON_PATTERN = /^https:\/\/api\.dicebear\.com\//;
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[SW] Pre-caching static assets');
-      // Verwende Promise.allSettled, um sicherzustellen, dass die Installation fortgesetzt wird, 
-      // auch wenn ein CDN-Asset fehlschlägt.
       return Promise.allSettled(
           STATIC_ASSETS.map(url => cache.add(url).catch(err => console.warn(`Failed to cache ${url}:`, err)))
       );
@@ -52,13 +52,12 @@ self.addEventListener('fetch', (event) => {
     return; 
   }
 
-  // Strategie: Stale-While-Revalidate für App-Logik und Index
-  if (url.includes(location.origin) || LIB_PATTERN.test(url)) {
+  // Strategie: Stale-While-Revalidate für App-Logik, Index und Icons
+  if (url.includes(location.origin) || LIB_PATTERN.test(url) || ICON_PATTERN.test(url)) {
     event.respondWith(
       caches.open(CACHE_NAME).then((cache) => {
         return cache.match(event.request).then((response) => {
           const fetchPromise = fetch(event.request).then((networkResponse) => {
-            // Nur valide Antworten cachen
             if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque')) {
               cache.put(event.request, networkResponse.clone());
             }
@@ -71,7 +70,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Strategie: Cache-First für alles andere (Fonts, CDNs)
+  // Strategie: Cache-First für Fonts und CDNs
   event.respondWith(
     caches.match(event.request).then((response) => {
       return response || fetch(event.request).then((networkResponse) => {

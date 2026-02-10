@@ -4,6 +4,10 @@
   "description": "Sophisticierte, moderne Finanzverwaltung für Privatpersonen und Freelancer.",
   "start_url": "./",
   "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "minimal-ui"
+  ],
   "background_color": "#0a0a0a",
   "theme_color": "#2563eb",
   "orientation": "portrait",
@@ -35,7 +39,8 @@
       "src": "https://api.dicebear.com/7.x/shapes/svg?seed=screenshot1&backgroundColor=2563eb",
       "sizes": "1080x1920",
       "type": "image/svg+xml",
-      "form_factor": "narrow"
+      "form_factor": "narrow",
+      "label": "Dashboard Übersicht"
     }
   ]
 }
