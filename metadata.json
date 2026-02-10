@@ -1,0 +1,41 @@
+{
+  "name": "Klaro Finance",
+  "short_name": "Klaro",
+  "description": "Sophisticierte, moderne Finanzverwaltung für Privatpersonen und Freelancer.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#2563eb",
+  "orientation": "portrait",
+  "scope": "./",
+  "categories": [
+    "finance",
+    "productivity"
+  ],
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "icons": [
+    {
+      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=klaro&backgroundColor=2563eb",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=klaro&backgroundColor=2563eb",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=screenshot1&backgroundColor=2563eb",
+      "sizes": "1080x1920",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    }
+  ]
+}
