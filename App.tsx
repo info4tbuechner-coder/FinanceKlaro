@@ -107,7 +107,6 @@ const AppContent: React.FC = () => {
     useEffect(() => {
         const handleAppInstalled = () => {
             console.log('App was successfully installed');
-            // Logic to hide custom install buttons could go here if managed globally
         };
         window.addEventListener('appinstalled', handleAppInstalled);
         return () => window.removeEventListener('appinstalled', handleAppInstalled);
@@ -150,10 +149,8 @@ const AppContent: React.FC = () => {
         }
     }, [activeModal]);
 
-    // Note: removed global 'pt-safe' here. It's now handled in the Header component 
-    // to ensure the header background extends behind the status bar/notch.
     return (
-        <div className={`theme-${theme} ${privacyMode ? 'privacy-mode' : ''} font-sans min-h-screen bg-gradient-to-br from-background-start to-background-end text-foreground transition-all duration-500 pb-20 lg:pb-0 ${isBlockchainTheme ? 'blockchain-bg' : ''}`}>
+        <div className={`theme-${theme} ${privacyMode ? 'privacy-mode' : ''} font-sans min-h-screen bg-gradient-to-br from-background-start to-background-end text-foreground transition-all duration-500 pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-0 ${isBlockchainTheme ? 'blockchain-bg' : ''}`}>
             <OfflineNotice />
             <Header />
             <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-8">
