@@ -1,7 +1,7 @@
 
 import React, { useState, memo, useEffect } from 'react';
 import { useAppState, useAppDispatch, useUpcomingBills } from '../context/AppContext';
-import { Sun, Moon, BarChart2, Settings, Menu, X, Bot, Palette, FileDown, UploadCloud, Repeat, Gem, LoaderCircle, Bell, Eye, EyeOff, Smartphone } from 'lucide-react';
+import { Sun, Moon, BarChart2, Settings, Menu, X, Bot, Palette, FileDown, UploadCloud, Repeat, Gem, LoaderCircle, Bell, Eye, EyeOff, Smartphone, Landmark } from 'lucide-react';
 import type { Theme, ViewMode, ModalType, ICStatus } from '../types';
 import { triggerHapticFeedback } from '../utils';
 import { Button } from './ui';
@@ -109,7 +109,7 @@ const Header: React.FC = () => {
     };
 
     return (
-        <header className="sticky top-0 z-40 w-full glass-card border-b border-border/10">
+        <header className="sticky top-0 z-40 w-full glass-card border-b border-border/10 pt-safe transition-all duration-300">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     <div className="flex items-center gap-4">
@@ -138,6 +138,7 @@ const Header: React.FC = () => {
                                     <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg py-1 glass-card ring-1 ring-black ring-opacity-5 z-20 animate-fade-in">
                                         <button onClick={() => { openModal({type: 'MANAGE_CATEGORIES'}); setIsDropdownOpen(false); }} className="w-full text-left block px-4 py-3 text-sm text-foreground hover:bg-secondary">Kategorien</button>
                                         <button onClick={() => { openModal({type: 'MANAGE_RECURRING'}); setIsDropdownOpen(false);}} className="w-full text-left block px-4 py-3 text-sm text-foreground hover:bg-secondary">Daueraufträge</button>
+                                        <button onClick={() => { openModal({type: 'MANAGE_LIABILITIES'}); setIsDropdownOpen(false);}} className="w-full text-left block px-4 py-3 text-sm text-foreground hover:bg-secondary">Verbindlichkeiten</button>
                                         <div className="border-t border-border my-1"></div>
                                         {deferredPrompt && (
                                             <button onClick={() => { handleInstall(); setIsDropdownOpen(false); }} className="w-full text-left flex items-center px-4 py-3 text-sm text-primary font-bold hover:bg-secondary">

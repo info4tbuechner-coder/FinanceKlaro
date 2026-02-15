@@ -103,6 +103,16 @@ const AppContent: React.FC = () => {
     const { dueOrOverdueCount } = useUpcomingBills();
     const isBlockchainTheme = theme === 'blockchain';
 
+    // PWA Lifecycle: appinstalled event
+    useEffect(() => {
+        const handleAppInstalled = () => {
+            console.log('App was successfully installed');
+            // Logic to hide custom install buttons could go here if managed globally
+        };
+        window.addEventListener('appinstalled', handleAppInstalled);
+        return () => window.removeEventListener('appinstalled', handleAppInstalled);
+    }, []);
+
     // PWA App Badging API sync
     useEffect(() => {
         if ('setAppBadge' in navigator) {
@@ -116,7 +126,6 @@ const AppContent: React.FC = () => {
 
     // Dynamic Theme-Sync for Body Background & System bars
     useEffect(() => {
-        // Fix: Corrected syntax errors in themeConfigs object literal (missing curly braces and property names)
         const themeConfigs: Record<string, { meta: string; body: string }> = {
             grandeur: { meta: '#f8fafc', body: '#f8fafc' },
             synthwave: { meta: '#0f0720', body: '#0f0720' },
@@ -141,8 +150,10 @@ const AppContent: React.FC = () => {
         }
     }, [activeModal]);
 
+    // Note: removed global 'pt-safe' here. It's now handled in the Header component 
+    // to ensure the header background extends behind the status bar/notch.
     return (
-        <div className={`theme-${theme} ${privacyMode ? 'privacy-mode' : ''} font-sans min-h-screen bg-gradient-to-br from-background-start to-background-end text-foreground transition-all duration-500 pb-20 lg:pb-0 ${isBlockchainTheme ? 'blockchain-bg' : ''} pt-safe`}>
+        <div className={`theme-${theme} ${privacyMode ? 'privacy-mode' : ''} font-sans min-h-screen bg-gradient-to-br from-background-start to-background-end text-foreground transition-all duration-500 pb-20 lg:pb-0 ${isBlockchainTheme ? 'blockchain-bg' : ''}`}>
             <OfflineNotice />
             <Header />
             <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-8">

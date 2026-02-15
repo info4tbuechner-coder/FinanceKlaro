@@ -4,7 +4,7 @@ import { useAppState, useAppDispatch } from '../../context/AppContext';
 import useReportsData from '../../hooks/useReportsData';
 import { AppState, SyncedAppState, Transaction, Category, Goal, Project, RecurringTransaction, TransactionType, CategoryType, GoalType, Frequency, ModalType, Liability, LiabilityType } from '../../types';
 import { GoogleGenAI, Type } from "@google/genai";
-import { X, Camera, Sparkles, Trash2, FileDown, UploadCloud, Edit, FileText, ArrowDownCircle, ArrowUpCircle, Calendar, LogIn, LogOut, RefreshCw, AlertTriangle, CheckCircle, Copy, LoaderCircle, BarChart, LineChart, WifiOff } from 'lucide-react';
+import { X, Camera, Sparkles, Trash2, FileDown, UploadCloud, Edit, FileText, ArrowDownCircle, ArrowUpCircle, Calendar, LogIn, LogOut, RefreshCw, AlertTriangle, CheckCircle, Copy, LoaderCircle, BarChart, LineChart, WifiOff, Search, Plus, Landmark } from 'lucide-react';
 import { Sankey, Tooltip, ResponsiveContainer, Rectangle, Bar, XAxis, YAxis, Legend as RechartsLegend, CartesianGrid, ComposedChart as RechartsComposedChart } from 'recharts';
 import { formatCurrency, formatDate, triggerHapticFeedback } from '../../utils';
 import { calculateDebtPaydownPlan } from '../../utils/financialUtils';
@@ -57,7 +57,8 @@ const TransactionModal: React.FC<{ transaction?: Transaction }> = memo(({ transa
                     value={formData.description} 
                     onChange={handleChange} 
                     required 
-                    autoFocus
+                    // autoFocus removed for better mobile UX (prevents jumpy keyboard pop-ups)
+                    placeholder="Wofür?"
                 />
             </FormGroup>
             <div className="grid grid-cols-2 gap-4">
@@ -91,8 +92,8 @@ const TransactionModal: React.FC<{ transaction?: Transaction }> = memo(({ transa
                 </Select>
             </FormGroup>
             <div className="flex justify-end space-x-2 pt-4">
-                <Button type="button" onClick={() => dispatch({type: 'CLOSE_MODAL'})}>Abbrechen</Button>
-                <Button type="submit" variant="primary">Speichern</Button>
+                <Button type="button" onClick={() => dispatch({type: 'CLOSE_MODAL'})} className="flex-1">Abbrechen</Button>
+                <Button type="submit" variant="primary" className="flex-1">Speichern</Button>
             </div>
         </form>
     );
@@ -323,6 +324,121 @@ const CategoryManagerModal: React.FC = memo(() => {
     );
 });
 
+const LiabilityManagerModal: React.FC = memo(() => {
+    const { liabilities } = useAppState();
+    const dispatch = useAppDispatch();
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isAdding, setIsAdding] = useState(false);
+    
+    const [formData, setFormData] = useState<Omit<Liability, 'id' | 'paidAmount'>>({
+        name: '',
+        type: LiabilityType.DEBT,
+        initialAmount: 0,
+        interestRate: 0,
+        minMonthlyPayment: 0
+    });
+
+    const filteredLiabilities = useMemo(() => {
+        return liabilities.filter(l => l.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    }, [liabilities, searchTerm]);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: name === 'initialAmount' || name === 'interestRate' || name === 'minMonthlyPayment' ? parseFloat(value) : value
+        }));
+    };
+
+    const handleAdd = (e: React.FormEvent) => {
+        e.preventDefault();
+        triggerHapticFeedback('success');
+        dispatch({ type: 'ADD_LIABILITY', payload: formData });
+        setIsAdding(false);
+        setFormData({ name: '', type: LiabilityType.DEBT, initialAmount: 0, interestRate: 0, minMonthlyPayment: 0 });
+    };
+
+    const handleDelete = (id: string) => {
+        if (window.confirm("Möchten Sie diese Verbindlichkeit wirklich löschen?")) {
+            triggerHapticFeedback('heavy');
+            dispatch({ type: 'DELETE_LIABILITY', payload: id });
+        }
+    };
+
+    return (
+        <div className="space-y-6">
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input 
+                    placeholder="Suchen..." 
+                    value={searchTerm} 
+                    onChange={(e) => setSearchTerm(e.target.value)} 
+                    className="pl-10"
+                />
+            </div>
+
+            <div className="space-y-3">
+                <div className="flex justify-between items-center px-1">
+                    <h4 className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Liste ({filteredLiabilities.length})</h4>
+                    <button 
+                        onClick={() => setIsAdding(!isAdding)} 
+                        className="text-primary hover:text-primary/80 transition-colors p-1"
+                    >
+                        {isAdding ? <X size={20} /> : <Plus size={20} />}
+                    </button>
+                </div>
+
+                {isAdding && (
+                    <form onSubmit={handleAdd} className="p-4 bg-primary/5 rounded-2xl border border-primary/20 space-y-4 animate-fade-in">
+                        <FormGroup label="Name" htmlFor="l-name">
+                            <Input id="l-name" name="name" value={formData.name} onChange={handleChange} required placeholder="Kredit, Darlehen..." />
+                        </FormGroup>
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormGroup label="Betrag" htmlFor="l-amount">
+                                <Input id="l-amount" name="initialAmount" type="number" step="0.01" value={formData.initialAmount} onChange={handleChange} required />
+                            </FormGroup>
+                            <FormGroup label="Zinssatz (%)" htmlFor="l-interest">
+                                <Input id="l-interest" name="interestRate" type="number" step="0.1" value={formData.interestRate} onChange={handleChange} required />
+                            </FormGroup>
+                        </div>
+                        <FormGroup label="Min. Rate" htmlFor="l-min">
+                            <Input id="l-min" name="minMonthlyPayment" type="number" step="0.01" value={formData.minMonthlyPayment} onChange={handleChange} required />
+                        </FormGroup>
+                        <Button type="submit" variant="primary" className="w-full">Erstellen</Button>
+                    </form>
+                )}
+
+                <div className="space-y-2">
+                    {filteredLiabilities.length > 0 ? filteredLiabilities.map(l => (
+                        <div key={l.id} className="glass-card p-4 rounded-xl flex items-center justify-between group">
+                            <div>
+                                <h5 className="font-bold text-foreground flex items-center gap-2">
+                                    <Landmark size={14} className="text-muted-foreground" /> {l.name}
+                                </h5>
+                                <div className="text-xs text-muted-foreground mt-1 flex gap-3">
+                                    <span>Zinsen: {l.interestRate}%</span>
+                                    <span>Rate: {formatCurrency(l.minMonthlyPayment)}</span>
+                                </div>
+                            </div>
+                            <div className="text-right flex items-center gap-4">
+                                <div>
+                                    <p className="text-sm font-bold text-foreground">{formatCurrency(l.initialAmount - l.paidAmount)}</p>
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Restschuld</p>
+                                </div>
+                                <button onClick={() => handleDelete(l.id)} className="p-2 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-all">
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
+                        </div>
+                    )) : (
+                        <div className="text-center py-10 text-muted-foreground">Keine Verbindlichkeiten gefunden.</div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+});
+
 const AnalysisModal: React.FC = () => {
     const { sankeyData } = useReportsData();
     return (
@@ -366,6 +482,7 @@ const ModalManager: React.FC = () => {
             case 'EDIT_TRANSACTION': return { title: "Eintrag bearbeiten", content: <TransactionModal transaction={activeModal.data} />, size: 'md' as const };
             case 'SMART_SCAN': return { title: "KI Beleg-Scan", content: <SmartScanModal />, size: 'lg' as const };
             case 'MANAGE_CATEGORIES': return { title: "Kategorien", content: <CategoryManagerModal />, size: 'lg' as const };
+            case 'MANAGE_LIABILITIES': return { title: "Verbindlichkeiten", content: <LiabilityManagerModal />, size: 'lg' as const };
             case 'ANALYSIS': return { title: "Cashflow Analyse", content: <AnalysisModal />, size: 'xl' as const };
             default: return { title: "Information", content: <div className="p-10 text-center text-muted-foreground">In Kürze verfügbar...</div>, size: 'md' as const };
         }

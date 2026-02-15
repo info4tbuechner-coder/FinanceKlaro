@@ -40,6 +40,18 @@
     
     input, textarea {
       user-select: text;
+      -webkit-appearance: none;
+      appearance: none;
+      border-radius: 0; /* Reset iOS defaults */
+    }
+
+    /* Custom Scrollbar Hiding for App-Like Feel */
+    .custom-scrollbar {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      display: none;
     }
 
     /* THEME: GRANDEUR (Light with Soft Dark-ish Accents) */

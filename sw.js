@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'klaro-finance-v7';
+const CACHE_NAME = 'klaro-finance-v8';
 const STATIC_ASSETS = [
   './',
   'index.html',

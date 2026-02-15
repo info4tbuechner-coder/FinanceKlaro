@@ -1,5 +1,5 @@
 {
-  "name": "Klaro Finance",
+  "name": "Finance",
   "short_name": "Klaro",
   "description": "Sophisticierte, moderne Finanzverwaltung für Privatpersonen und Freelancer.",
   "start_url": "./",
@@ -40,7 +40,14 @@
       "sizes": "1080x1920",
       "type": "image/svg+xml",
       "form_factor": "narrow",
-      "label": "Dashboard Übersicht"
+      "label": "Klaro Dashboard"
+    },
+    {
+      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=screenshot2&backgroundColor=0f172a",
+      "sizes": "1920x1080",
+      "type": "image/svg+xml",
+      "form_factor": "wide",
+      "label": "Klaro Desktop Analyse"
     }
   ]
 }
