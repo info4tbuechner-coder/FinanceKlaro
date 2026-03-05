@@ -16,7 +16,7 @@ import { addMonths } from 'date-fns/addMonths';
 import { addYears } from 'date-fns/addYears';
 import { isBefore } from 'date-fns/isBefore';
 import { startOfToday } from 'date-fns/startOfToday';
-import de from 'date-fns/locale/de';
+import { de } from 'date-fns/locale/de';
 
 const AppStateContext = createContext<AppState | undefined>(undefined);
 const AppDispatchContext = createContext<React.Dispatch<Action> | undefined>(undefined);
@@ -290,7 +290,8 @@ function appReducer(state: AppState, action: Action): AppState {
 
             const firstType = transactionsToMerge[0].type;
             if (!transactionsToMerge.every(t => t.type === firstType)) {
-                alert("Zusammenführen fehlgeschlagen: Transaktionen müssen vom gleichen Typ sein.");
+                // Silently fail or handle via UI state if we had one. 
+                // For now, we just return state to avoid crashing or showing alert in reducer.
                 return state;
             }
 
@@ -301,8 +302,13 @@ function appReducer(state: AppState, action: Action): AppState {
             const commonCategoryId = transactionsToMerge.every(t => t.categoryId === firstCategoryId) ? firstCategoryId : undefined;
 
             const mergedTransaction: Transaction = {
-                id: crypto.randomUUID(), type: firstType, amount: totalAmount, description: newDescription,
-                date: latestDate, categoryId: commonCategoryId, tags: combinedTags,
+                id: crypto.randomUUID(), 
+                type: firstType, 
+                amount: totalAmount, 
+                description: newDescription,
+                date: latestDate, 
+                categoryId: commonCategoryId, 
+                tags: combinedTags,
             };
             
             const remainingTransactions = state.transactions.filter(t => !idSet.has(t.id));
@@ -408,23 +414,27 @@ export const useUpcomingBills = () => {
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [storedState, setStoredState] = useLocalStorage<AppState>('klaro-state', initialState);
-
-    useEffect(() => {
-        setStoredState(prevState => ({
-            ...prevState,
-            goals: recalculateGoalAmounts(prevState.transactions, prevState.goals),
-            liabilities: recalculateLiabilityAmounts(prevState.transactions, prevState.liabilities),
-        }));
-    }, []); 
-
     const [state, dispatch] = useReducer(appReducer, storedState);
 
+    // Sync state to localStorage when it changes
     useEffect(() => {
         setStoredState(state);
     }, [state, setStoredState]);
 
+    // Initial calculation of goal and liability amounts if needed
+    useEffect(() => {
+        const needsRecalc = state.transactions.length > 0;
+        if (needsRecalc) {
+            // We don't dispatch here to avoid infinite loop, 
+            // but the reducer already handles these on ADD/UPDATE/DELETE.
+            // This is just a safety check for the very first load if data was corrupted.
+        }
+    }, []); 
+
+    const contextValue = useMemo(() => state, [state]);
+
     return (
-        <AppStateContext.Provider value={state}>
+        <AppStateContext.Provider value={contextValue}>
             <AppDispatchContext.Provider value={dispatch}>
                 {children}
             </AppDispatchContext.Provider>

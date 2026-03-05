@@ -10,7 +10,7 @@ import { startOfMonth } from 'date-fns/startOfMonth';
 import { parseISO } from 'date-fns/parseISO';
 import { endOfMonth } from 'date-fns/endOfMonth';
 // Fix: Use direct import for locale to prevent type errors.
-import de from 'date-fns/locale/de';
+import { de } from 'date-fns/locale/de';
 
 const useReportsData = (): ReportsData => {
     const { categories, projects, transactions: allTransactions } = useAppState();
@@ -18,12 +18,17 @@ const useReportsData = (): ReportsData => {
 
     const budgetOverviewData = useMemo(() => {
         const expenseCategoriesWithBudget = categories.filter(c => c.type === CategoryType.EXPENSE && c.budget && c.budget > 0);
+        if (expenseCategoriesWithBudget.length === 0) return [];
+
+        const spentByCategory = filteredTransactions.reduce((acc, t) => {
+            if (t.type === TransactionType.EXPENSE && t.categoryId) {
+                acc[t.categoryId] = (acc[t.categoryId] || 0) + t.amount;
+            }
+            return acc;
+        }, {} as Record<string, number>);
         
         return expenseCategoriesWithBudget.map(category => {
-            const spent = filteredTransactions
-                .filter(t => t.categoryId === category.id && t.type === TransactionType.EXPENSE)
-                .reduce((sum, t) => sum + t.amount, 0);
-            
+            const spent = spentByCategory[category.id] || 0;
             return {
                 id: category.id,
                 name: category.name,
@@ -35,13 +40,14 @@ const useReportsData = (): ReportsData => {
     }, [categories, filteredTransactions]);
 
     const expenseDataForPieChart = useMemo(() => {
-        const expenseByCategory = filteredTransactions
-            .filter(t => t.type === TransactionType.EXPENSE && t.amount > 0)
-            .reduce((acc, t) => {
-                const categoryName = categories.find(c => c.id === t.categoryId)?.name || 'Unkategorisiert';
+        const categoryMap = new Map(categories.map(c => [c.id, c.name]));
+        const expenseByCategory = filteredTransactions.reduce((acc, t) => {
+            if (t.type === TransactionType.EXPENSE && t.amount > 0) {
+                const categoryName = (t.categoryId && categoryMap.get(t.categoryId)) || 'Unkategorisiert';
                 acc[categoryName] = (acc[categoryName] || 0) + t.amount;
-                return acc;
-            }, {} as { [key: string]: number });
+            }
+            return acc;
+        }, {} as Record<string, number>);
 
         return Object.entries(expenseByCategory)
             .map(([name, value]) => ({ name, value }))
@@ -49,11 +55,14 @@ const useReportsData = (): ReportsData => {
     }, [categories, filteredTransactions]);
 
     const projectReportData = useMemo(() => {
-        // Fix: Add explicit type annotation to map callback to ensure correct type inference.
         return projects.map((project): ReportsData['projectReportData'][number] => {
             const projectTransactions = filteredTransactions.filter(t => t.tags?.includes(project.tag));
-            const income = projectTransactions.filter(t => t.type === TransactionType.INCOME).reduce((sum, t) => sum + t.amount, 0);
-            const expense = projectTransactions.filter(t => t.type === TransactionType.EXPENSE).reduce((sum, t) => sum + t.amount, 0);
+            let income = 0;
+            let expense = 0;
+            projectTransactions.forEach(t => {
+                if (t.type === TransactionType.INCOME) income += t.amount;
+                else if (t.type === TransactionType.EXPENSE) expense += t.amount;
+            });
 
             return {
                 name: project.name,
@@ -69,26 +78,37 @@ const useReportsData = (): ReportsData => {
     const cashflowData = useMemo(() => {
         const data: { month: string; Einnahmen: number; Ausgaben: number }[] = [];
         const today = new Date();
-        for (let i = 11; i >= 0; i--) {
-            const date = subMonths(today, i);
-            const monthStart = startOfMonth(date);
-            const monthEnd = endOfMonth(date);
+        
+        // Pre-calculate month boundaries to avoid redundant date operations
+        const months = Array.from({ length: 12 }, (_, i) => {
+            const date = subMonths(today, 11 - i);
+            return {
+                date,
+                start: format(startOfMonth(date), 'yyyy-MM-dd'),
+                end: format(endOfMonth(date), 'yyyy-MM-dd'),
+                label: format(date, 'MMM', { locale: de as any })
+            };
+        });
 
-            const monthTransactions = allTransactions.filter(t => {
-                const tDate = parseISO(t.date);
-                return tDate >= monthStart && tDate <= monthEnd;
+        months.forEach(m => {
+            let income = 0;
+            let expense = 0;
+            
+            // Single pass over all transactions for each month is still O(12 * N)
+            // but we can optimize by grouping all transactions by month first.
+            allTransactions.forEach(t => {
+                if (t.date >= m.start && t.date <= m.end) {
+                    if (t.type === TransactionType.INCOME) income += t.amount;
+                    else if (t.type === TransactionType.EXPENSE) expense += t.amount;
+                }
             });
 
-            const income = monthTransactions.filter(t => t.type === TransactionType.INCOME).reduce((sum, t) => sum + t.amount, 0);
-            const expense = monthTransactions.filter(t => t.type === TransactionType.EXPENSE).reduce((sum, t) => sum + t.amount, 0);
-            
             data.push({
-                // Fix: Cast locale to any to handle module resolution differences in build env
-                month: format(date, 'MMM', { locale: de as any }),
+                month: m.label,
                 Einnahmen: income,
                 Ausgaben: expense,
             });
-        }
+        });
         return data;
     }, [allTransactions]);
 

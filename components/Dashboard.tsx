@@ -18,9 +18,8 @@ const StatCard: React.FC<{ title: string; amount: number; trend: number; icon: R
             <div className="w-full">
                 <div className="flex items-center justify-between mb-2">
                     <h3 className="text-muted-foreground text-xs sm:text-base font-medium truncate uppercase tracking-tighter">{title}</h3>
-                    <div className="bg-primary/10 text-primary p-2 rounded-lg sm:hidden">
-                        {/* Fix: Casting to React.ReactElement<any> to avoid type errors when adding props via cloneElement */}
-                        {React.cloneElement(icon as React.ReactElement<any>, { size: 16 })}
+                    <div className="bg-primary/10 text-primary p-2 rounded-lg sm:hidden flex items-center justify-center [&>svg]:w-4 [&>svg]:h-4">
+                        {icon}
                     </div>
                 </div>
                 <p className="text-xl sm:text-3xl font-bold text-foreground truncate" data-privacy>{formatCurrency(amount)}</p>

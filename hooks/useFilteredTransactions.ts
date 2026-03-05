@@ -9,53 +9,41 @@ const useFilteredTransactions = (): Transaction[] => {
     const { transactions, filters, viewMode } = useAppState();
 
     return useMemo(() => {
-        const startDate = parseISO(filters.dateRange.from);
-        const endDate = parseISO(filters.dateRange.to);
-        endDate.setHours(23, 59, 59, 999); // include transactions on the end date
+        const startStr = filters.dateRange.from;
+        const endStr = filters.dateRange.to;
 
         return transactions
             .filter(t => {
-                // Date range filter
-                const transactionDate = parseISO(t.date);
-                return isWithinInterval(transactionDate, { start: startDate, end: endDate });
-            })
-            .filter(t => {
+                // Date range filter (string comparison works for yyyy-MM-dd)
+                if (t.date < startStr || t.date > endStr) return false;
+
                 // ViewMode filter
-                if (viewMode === 'private') {
-                    // Show transactions without a 'business' tag. This includes untagged transactions.
-                    return !t.tags?.includes('business');
-                }
-                if (viewMode === 'business') {
-                    return t.tags?.includes('business');
-                }
-                return true; // 'all'
-            })
-            .filter(t => {
+                if (viewMode === 'private' && t.tags?.includes('business')) return false;
+                if (viewMode === 'business' && !t.tags?.includes('business')) return false;
+
                 // Transaction type filter
-                if (filters.transactionType === 'all') return true;
-                return t.type === filters.transactionType;
-            })
-            .filter(t => {
+                if (filters.transactionType !== 'all' && t.type !== filters.transactionType) return false;
+
                 // Category filter
-                if (!filters.categoryId) return true;
-                return t.categoryId === filters.categoryId;
-            })
-            .filter(t => {
+                if (filters.categoryId && t.categoryId !== filters.categoryId) return false;
+
                 // Search term filter
                 const searchTerm = filters.searchTerm.toLowerCase();
-                if (!searchTerm) return true;
-                const descriptionMatch = t.description.toLowerCase().includes(searchTerm);
-                const tagMatch = t.tags?.some(tag => tag.toLowerCase().includes(searchTerm));
-                const amountMatch = t.amount.toString().includes(searchTerm);
-                return descriptionMatch || tagMatch || amountMatch;
+                if (searchTerm) {
+                    const descriptionMatch = t.description.toLowerCase().includes(searchTerm);
+                    const tagMatch = t.tags?.some(tag => tag.toLowerCase().includes(searchTerm));
+                    const amountMatch = t.amount.toString().includes(searchTerm);
+                    if (!descriptionMatch && !tagMatch && !amountMatch) return false;
+                }
+
+                // Tags filter
+                if (filters.tags.length > 0) {
+                    if (!t.tags || !filters.tags.some(filterTag => t.tags?.includes(filterTag))) return false;
+                }
+
+                return true;
             })
-            .filter(t => {
-                // Tags filter (must have at least one of the selected tags)
-                if (filters.tags.length === 0) return true;
-                if (!t.tags || t.tags.length === 0) return false;
-                return filters.tags.some(filterTag => t.tags?.includes(filterTag));
-            })
-            .sort((a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime());
+            .sort((a, b) => b.date.localeCompare(a.date));
     }, [transactions, filters, viewMode]);
 };
 

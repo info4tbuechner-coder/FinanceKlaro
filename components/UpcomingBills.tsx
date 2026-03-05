@@ -6,7 +6,7 @@ import { formatCurrency, triggerHapticFeedback } from '../utils';
 import { formatDistance } from 'date-fns/formatDistance';
 import { isToday } from 'date-fns/isToday';
 import { isPast } from 'date-fns/isPast';
-import de from 'date-fns/locale/de';
+import { de } from 'date-fns/locale/de';
 import type { RecurringTransaction } from '../types';
 
 const DueDateIndicator: React.FC<{ dueDate: Date }> = ({ dueDate }) => {

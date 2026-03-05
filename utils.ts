@@ -3,10 +3,12 @@
 import { format } from 'date-fns/format';
 import { parseISO } from 'date-fns/parseISO';
 // Fix: Use direct import for locale to prevent type errors.
-import de from 'date-fns/locale/de';
+import { de } from 'date-fns/locale/de';
+
+const currencyFormatter = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' });
 
 export const formatCurrency = (value: number): string => {
-    return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value);
+    return currencyFormatter.format(value);
 };
 
 export const formatDate = (dateString: string | undefined): string => {

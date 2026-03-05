@@ -9,11 +9,11 @@ import { Sankey, Tooltip, ResponsiveContainer, Rectangle, Bar, XAxis, YAxis, Leg
 import { formatCurrency, formatDate, triggerHapticFeedback } from '../../utils';
 import { calculateDebtPaydownPlan } from '../../utils/financialUtils';
 import { Modal, FormGroup, Input, Select, Button } from '../ui';
-import isPast from 'date-fns/isPast';
-import isToday from 'date-fns/isToday';
-import differenceInDays from 'date-fns/differenceInDays';
-import parseISO from 'date-fns/parseISO';
-import startOfToday from 'date-fns/startOfToday';
+import { isPast } from 'date-fns/isPast';
+import { isToday } from 'date-fns/isToday';
+import { differenceInDays } from 'date-fns/differenceInDays';
+import { parseISO } from 'date-fns/parseISO';
+import { startOfToday } from 'date-fns/startOfToday';
 import { login, logout, getActor, getPrincipal } from '../../services/ic';
 
 
@@ -91,6 +91,30 @@ const TransactionModal: React.FC<{ transaction?: Transaction }> = memo(({ transa
                     {categories.filter(c => c.type === (formData.type === 'income' ? 'income' : 'expense')).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </Select>
             </FormGroup>
+            {formData.type === TransactionType.SAVING && (
+                <FormGroup label="Sparziel" htmlFor="goalId">
+                    <Select name="goalId" id="goalId" value={formData.goalId} onChange={handleChange}>
+                        <option value="">Kein Ziel</option>
+                        {goals.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+                    </Select>
+                </FormGroup>
+            )}
+            {formData.type === TransactionType.EXPENSE && (
+                <FormGroup label="Verbindlichkeit (Tilgung)" htmlFor="liabilityId">
+                    <Select name="liabilityId" id="liabilityId" value={formData.liabilityId} onChange={handleChange}>
+                        <option value="">Keine Verbindlichkeit</option>
+                        {liabilities.filter(l => l.type === LiabilityType.DEBT).map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                    </Select>
+                </FormGroup>
+            )}
+            {formData.type === TransactionType.INCOME && (
+                <FormGroup label="Verbindlichkeit (Auszahlung)" htmlFor="liabilityId">
+                    <Select name="liabilityId" id="liabilityId" value={formData.liabilityId} onChange={handleChange}>
+                        <option value="">Keine Verbindlichkeit</option>
+                        {liabilities.filter(l => l.type === LiabilityType.LOAN).map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                    </Select>
+                </FormGroup>
+            )}
             <div className="flex justify-end space-x-2 pt-4">
                 <Button type="button" onClick={() => dispatch({type: 'CLOSE_MODAL'})} className="flex-1">Abbrechen</Button>
                 <Button type="submit" variant="primary" className="flex-1">Speichern</Button>
