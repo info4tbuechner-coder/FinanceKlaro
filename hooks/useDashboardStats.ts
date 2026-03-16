@@ -18,9 +18,11 @@ const calculateStats = (transactions: Transaction[]): Omit<DashboardStats, 'inco
     return { ...stats, balance: stats.income - stats.expense - stats.saving };
 };
 
+const NO_PREV_DATA_SENTINEL = 9999;
+
 const calculateTrend = (current: number, previous: number): number => {
     if (previous === 0) {
-        return current > 0 ? 100 : 0;
+        return current > 0 ? NO_PREV_DATA_SENTINEL : 0;
     }
     if (current === previous) {
         return 0;

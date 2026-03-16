@@ -154,7 +154,7 @@ const TransactionItem = memo(({ transaction, isSelected, toggleSelection }: { tr
             <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                     <p className="font-semibold text-sm sm:text-base truncate pr-2">{transaction.description}</p>
-                    <p className={`font-bold text-sm sm:text-base ${transaction.type === TransactionType.INCOME ? 'text-success' : 'text-foreground'}`}>
+                    <p className={`font-bold text-sm sm:text-base tabular-nums flex-shrink-0 ${transaction.type === TransactionType.INCOME ? 'text-success' : 'text-foreground'}`} data-privacy>
                         {transaction.type === TransactionType.EXPENSE ? '-' : transaction.type === TransactionType.INCOME ? '+' : ''}{formatCurrency(transaction.amount)}
                     </p>
                 </div>

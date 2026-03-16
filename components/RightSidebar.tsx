@@ -140,8 +140,8 @@ const BudgetOverview: React.FC = () => {
                             </div>
                             
                             <div className="flex justify-between text-xs mt-1 text-muted-foreground">
-                                <span className="font-medium">{formatCurrency(item.spent)}</span>
-                                <span>von {formatCurrency(item.budget)}</span>
+                                <span className="font-medium tabular-nums" data-privacy>{formatCurrency(item.spent)}</span>
+                                <span className="tabular-nums" data-privacy>von {formatCurrency(item.budget)}</span>
                             </div>
                         </div>
                     </div>

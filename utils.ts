@@ -6,9 +6,20 @@ import { parseISO } from 'date-fns/parseISO';
 import { de } from 'date-fns/locale/de';
 
 const currencyFormatter = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' });
+const currencyFormatterCompact = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0, minimumFractionDigits: 0 });
 
 export const formatCurrency = (value: number): string => {
     return currencyFormatter.format(value);
+};
+
+export const formatCurrencyCompact = (value: number): string => {
+    if (Math.abs(value) >= 1_000_000) {
+        return `${(value / 1_000_000).toLocaleString('de-DE', { maximumFractionDigits: 1 })} Mio. €`;
+    }
+    if (Math.abs(value) >= 10_000) {
+        return `${(value / 1_000).toLocaleString('de-DE', { maximumFractionDigits: 1 })}K €`;
+    }
+    return currencyFormatterCompact.format(value);
 };
 
 export const formatDate = (dateString: string | undefined): string => {

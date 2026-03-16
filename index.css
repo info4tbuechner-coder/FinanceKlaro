@@ -1,5 +1,27 @@
 @import "tailwindcss";
 
+/* ── Privacy Mode ── */
+.privacy-mode [data-privacy] {
+  filter: blur(7px);
+  transition: filter 0.25s ease;
+  user-select: none;
+}
+.privacy-mode [data-privacy]:hover {
+  filter: blur(3px);
+}
+
+/* ── Smooth focus-visible rings ── */
+*:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* ── Scrollbar styling ── */
+.custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 9999px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground)); }
+
 @theme inline {
   --font-sans: 'Inter', sans-serif;
 

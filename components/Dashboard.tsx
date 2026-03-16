@@ -4,31 +4,30 @@ import { useAppState, useAppDispatch } from '../context/AppContext';
 import useDashboardStats from '../hooks/useDashboardStats';
 import useReportsData from '../hooks/useReportsData';
 import { ArrowUpRight, ArrowDownRight, Minus, AlertCircle, TrendingUp, TrendingDown, Wallet, Landmark } from 'lucide-react';
-import { formatCurrency, triggerHapticFeedback } from '../utils';
+import { formatCurrency, formatCurrencyCompact, triggerHapticFeedback } from '../utils';
 
 const StatCard: React.FC<{ title: string; amount: number; trend: number; icon: React.ReactNode }> = memo(({ title, amount, trend, icon }) => {
+    const isNewData = Math.abs(trend) >= 9999;
     const TrendIcon = trend > 0 ? ArrowUpRight : trend < 0 ? ArrowDownRight : Minus;
-    const trendColor = trend > 0 ? 'text-success' : trend < 0 ? 'text-destructive' : 'text-muted-foreground';
+    const trendColor = isNewData ? 'text-muted-foreground' : trend > 0 ? 'text-success' : trend < 0 ? 'text-destructive' : 'text-muted-foreground';
+    const trendDisplay = isNewData ? 'Neu' : `${Math.min(Math.abs(trend), 999).toFixed(0)}%`;
 
     return (
         <div 
             onClick={() => triggerHapticFeedback('light')}
-            className="glass-card stat-card-bg p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-start justify-between group transition-all duration-300 active:scale-[0.98] cursor-default"
+            className="glass-card stat-card-bg p-4 rounded-2xl flex items-start justify-between group transition-all duration-300 active:scale-[0.98] cursor-default"
         >
-            <div className="w-full">
-                <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-muted-foreground text-xs sm:text-base font-medium truncate uppercase tracking-tighter">{title}</h3>
-                    <div className="bg-primary/10 text-primary p-2 rounded-lg sm:hidden flex items-center justify-center [&>svg]:w-4 [&>svg]:h-4">
-                        {icon}
-                    </div>
-                </div>
-                <p className="text-xl sm:text-3xl font-bold text-foreground truncate" data-privacy>{formatCurrency(amount)}</p>
-                 <div className={`mt-2 flex items-center text-[10px] sm:text-sm font-semibold ${trendColor}`}>
-                    <TrendIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-0.5 sm:mr-1" />
-                    <span>{Math.abs(trend).toFixed(0)}%</span>
+            <div className="min-w-0 flex-1">
+                <h3 className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest mb-1.5 truncate">{title}</h3>
+                <p className="text-xl font-extrabold text-foreground tabular-nums overflow-hidden text-ellipsis whitespace-nowrap" data-privacy>
+                    {formatCurrencyCompact(amount)}
+                </p>
+                <div className={`mt-1 flex items-center text-[10px] font-bold gap-0.5 ${trendColor}`}>
+                    {!isNewData && <TrendIcon className="h-3 w-3 flex-shrink-0" />}
+                    <span className="whitespace-nowrap">{trendDisplay}</span>
                 </div>
             </div>
-             <div className="hidden sm:block bg-primary/10 text-primary p-3 rounded-lg transition-transform duration-300 group-hover:scale-110">
+            <div className="bg-primary/10 text-primary p-2.5 rounded-xl transition-transform duration-300 group-hover:scale-110 flex-shrink-0 ml-3 [&>svg]:w-5 [&>svg]:h-5">
                 {icon}
             </div>
         </div>
