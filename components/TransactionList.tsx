@@ -176,11 +176,20 @@ const TransactionItem = memo(({ transaction, isSelected, toggleSelection }: { tr
     );
 });
 
+const PAGE_SIZE = 25;
+
 // Main TransactionList component rendering the full list section
 const TransactionList: React.FC = () => {
     const transactions = useFilteredTransactions();
-    const { selectedTransactions, transactions: allTransactions } = useAppState();
+    const { selectedTransactions, transactions: allTransactions, filters } = useAppState();
     const dispatch = useAppDispatch();
+    const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+    // Reset visible count whenever active filters change
+    useEffect(() => { setVisibleCount(PAGE_SIZE); }, [filters]);
+
+    const visibleTransactions = useMemo(() => transactions.slice(0, visibleCount), [transactions, visibleCount]);
+    const hasMore = transactions.length > visibleCount;
 
     // Extract all unique tags for the filter dropdown
     const allTags = useMemo(() => {
@@ -222,26 +231,26 @@ const TransactionList: React.FC = () => {
                         <span className="text-xs font-bold text-primary mr-2">{selectedTransactions.size} ausgewählt</span>
                         <Button onClick={handleBulkMerge} variant="secondary" className="px-3 py-1.5 h-auto text-[10px] uppercase tracking-widest"><Combine size={14} className="mr-1.5" /> Zusammenführen</Button>
                         <Button onClick={handleBulkDelete} variant="destructive" className="px-3 py-1.5 h-auto text-[10px] uppercase tracking-widest"><Trash2 size={14} className="mr-1.5" /> Löschen</Button>
-                        <button 
-                            onClick={() => dispatch({ type: 'SET_SELECTED_TRANSACTIONS', payload: new Set() })} 
+                        <button
+                            onClick={() => dispatch({ type: 'SET_SELECTED_TRANSACTIONS', payload: new Set() })}
                             className="p-1.5 hover:bg-secondary rounded-full text-muted-foreground transition-colors"
                         >
-                            <X size={16}/>
+                            <X size={16} />
                         </button>
                     </div>
                 )}
             </div>
-            
+
             <FilterBar allTags={allTags} />
-            
-            <div className="divide-y divide-border/5 max-h-[600px] overflow-y-auto custom-scrollbar">
-                {transactions.length > 0 ? (
-                    transactions.map(t => (
-                        <TransactionItem 
-                            key={t.id} 
-                            transaction={t} 
-                            isSelected={selectedTransactions.has(t.id)} 
-                            toggleSelection={toggleSelection} 
+
+            <div className="divide-y divide-border/5">
+                {visibleTransactions.length > 0 ? (
+                    visibleTransactions.map(t => (
+                        <TransactionItem
+                            key={t.id}
+                            transaction={t}
+                            isSelected={selectedTransactions.has(t.id)}
+                            toggleSelection={toggleSelection}
                         />
                     ))
                 ) : (
@@ -252,12 +261,20 @@ const TransactionList: React.FC = () => {
                     </div>
                 )}
             </div>
-            
-            {transactions.length > 0 && (
-                <div className="p-4 bg-secondary/20 flex justify-center border-t border-border/10">
-                    <p className="text-[10px] text-muted-foreground uppercase font-black tracking-[0.2em]">{transactions.length} Einträge angezeigt</p>
-                </div>
-            )}
+
+            <div className="p-4 bg-secondary/20 border-t border-border/10 flex items-center justify-between">
+                <p className="text-[10px] text-muted-foreground uppercase font-black tracking-[0.2em]">
+                    {visibleTransactions.length} von {transactions.length}
+                </p>
+                {hasMore && (
+                    <button
+                        onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
+                        className="text-xs font-bold text-primary hover:text-primary/80 transition-colors px-3 py-1 rounded-lg hover:bg-primary/10"
+                    >
+                        Mehr laden ({transactions.length - visibleCount} weitere)
+                    </button>
+                )}
+            </div>
         </section>
     );
 };

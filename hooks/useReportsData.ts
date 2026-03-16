@@ -6,10 +6,6 @@ import { TransactionType, CategoryType, ReportsData } from '../types';
 // Fix: Switched to direct submodule imports for date-fns to resolve module export errors.
 import { format } from 'date-fns/format';
 import { subMonths } from 'date-fns/subMonths';
-import { startOfMonth } from 'date-fns/startOfMonth';
-import { parseISO } from 'date-fns/parseISO';
-import { endOfMonth } from 'date-fns/endOfMonth';
-// Fix: Use direct import for locale to prevent type errors.
 import { de } from 'date-fns/locale/de';
 
 const useReportsData = (): ReportsData => {
@@ -76,40 +72,24 @@ const useReportsData = (): ReportsData => {
     }, [projects, filteredTransactions]);
 
     const cashflowData = useMemo(() => {
-        const data: { month: string; Einnahmen: number; Ausgaben: number }[] = [];
         const today = new Date();
-        
-        // Pre-calculate month boundaries to avoid redundant date operations
-        const months = Array.from({ length: 12 }, (_, i) => {
+
+        // O(N) single pass: group transactions by "yyyy-MM" key
+        const byMonth = new Map<string, { Einnahmen: number; Ausgaben: number }>();
+        allTransactions.forEach(t => {
+            const key = t.date.slice(0, 7);
+            if (!byMonth.has(key)) byMonth.set(key, { Einnahmen: 0, Ausgaben: 0 });
+            const m = byMonth.get(key)!;
+            if (t.type === TransactionType.INCOME) m.Einnahmen += t.amount;
+            else if (t.type === TransactionType.EXPENSE) m.Ausgaben += t.amount;
+        });
+
+        return Array.from({ length: 12 }, (_, i) => {
             const date = subMonths(today, 11 - i);
-            return {
-                date,
-                start: format(startOfMonth(date), 'yyyy-MM-dd'),
-                end: format(endOfMonth(date), 'yyyy-MM-dd'),
-                label: format(date, 'MMM', { locale: de as any })
-            };
+            const key = format(date, 'yyyy-MM');
+            const m = byMonth.get(key) ?? { Einnahmen: 0, Ausgaben: 0 };
+            return { month: format(date, 'MMM', { locale: de as any }), ...m };
         });
-
-        months.forEach(m => {
-            let income = 0;
-            let expense = 0;
-            
-            // Single pass over all transactions for each month is still O(12 * N)
-            // but we can optimize by grouping all transactions by month first.
-            allTransactions.forEach(t => {
-                if (t.date >= m.start && t.date <= m.end) {
-                    if (t.type === TransactionType.INCOME) income += t.amount;
-                    else if (t.type === TransactionType.EXPENSE) expense += t.amount;
-                }
-            });
-
-            data.push({
-                month: m.label,
-                Einnahmen: income,
-                Ausgaben: expense,
-            });
-        });
-        return data;
     }, [allTransactions]);
 
     const sankeyData = useMemo(() => {

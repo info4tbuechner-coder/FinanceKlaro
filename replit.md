@@ -34,13 +34,21 @@ Eine React/TypeScript Personal-Finance-App (PWA) gebaut mit Vite.
 - `index.html` – HTML-Shell, Theme-Styles, PWA-Tags
 - `sw.js` – Service Worker (Cache-Strategie)
 - `components/` – Dashboard, Header, TransactionList, RightSidebar, UpcomingBills
-- `components/modals/` – ModalManager (alle Modals)
+- `components/modals/` – ModalManager (Router) + je eine Datei pro Modal (lazy geladen)
 - `components/ui.tsx` – UI-Komponenten (Modal, Input, Button...)
 - `context/AppContext.tsx` – Globaler State (useReducer + localStorage)
 - `hooks/` – useDashboardStats, useReportsData, useFilteredTransactions, useLocalStorage
 - `services/ic.ts` – Internet Computer Service
 - `utils/` – financialUtils, formatCurrency, etc.
 - `types.ts` – TypeScript Typen
+
+## Performance / Bundle
+- **Lazy-Loading**: Alle Modal-Komponenten via `React.lazy()` – nur bei Bedarf geladen
+- **Bundle-Split**: index.js 65 kB, 6 Modal-Chunks je 1–6 kB, keine Circular-Chunk-Warnungen
+- **Cashflow**: O(N) Map-Algorithmus (statt O(12×N) Loop)
+- **Pagination**: TransactionList zeigt 25 Einträge + "Mehr laden"
+- **Splash-Screen**: `components/SplashScreen.tsx` – einmal pro Session, "Ch. von Büchner" Credit
+- **Privacy-Modus**: `data-privacy`-Attribut auf sensiblen Werten, CSS-Blur
 
 ## Konfiguration
 - Dev-Server: `0.0.0.0:5000`, `allowedHosts: true`
