@@ -1,18 +1,20 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { AppProvider, useAppState, useAppDispatch, useUpcomingBills } from './context/AppContext';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
 import TransactionList from './components/TransactionList';
-import RightSidebar from './components/RightSidebar';
 import ModalManager from './components/modals/ModalManager';
+
 import SplashScreen from './components/SplashScreen';
 import LoginPage from './components/LoginPage';
 import { useAuth } from './hooks/useAuth';
 import { Plus, ScanLine, LayoutDashboard, Receipt, BarChart2, WifiOff, LoaderCircle } from 'lucide-react';
 import { triggerHapticFeedback } from './utils';
 
-const OfflineNotice: React.FC = () => {
+const RightSidebar = lazy(() => import('./components/RightSidebar'));
+
+const OfflineNotice: React.FC = React.memo(() => {
     const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
     useEffect(() => {
@@ -37,7 +39,7 @@ const OfflineNotice: React.FC = () => {
             </div>
         </div>
     );
-};
+});
 
 const MobileNavBar: React.FC = () => {
     const { activeSidebarTab } = useAppState();
@@ -172,7 +174,9 @@ const AppContent: React.FC = () => {
                         <TransactionList />
                     </div>
                     <div className="hidden lg:block lg:col-span-1">
-                        <RightSidebar />
+                        <Suspense fallback={<div className="h-96 rounded-2xl bg-secondary/30 animate-pulse" />}>
+                            <RightSidebar />
+                        </Suspense>
                     </div>
                 </div>
             </main>

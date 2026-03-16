@@ -22,9 +22,24 @@ const FilterBar = memo(({ allTags }: { allTags: string[] }) => {
     const { filters } = useAppState();
     const dispatch = useAppDispatch();
     
-    // Helper to update filters via context dispatch
     const updateFilters = useCallback((newFilters: Partial<Filters>) => 
         dispatch({ type: 'UPDATE_FILTERS', payload: newFilters }), [dispatch]);
+
+    // Local search state + debounce so context only updates after typing stops
+    const [localSearch, setLocalSearch] = useState(filters.searchTerm);
+    const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+        setLocalSearch(val);
+        if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+        searchTimerRef.current = setTimeout(() => updateFilters({ searchTerm: val }), 180);
+    }, [updateFilters]);
+
+    // Keep local in sync if filter is cleared externally
+    useEffect(() => {
+        if (filters.searchTerm === '' && localSearch !== '') setLocalSearch('');
+    }, [filters.searchTerm]);
     
     const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
     const tagFilterRef = useRef<HTMLDivElement>(null);
@@ -60,8 +75,8 @@ const FilterBar = memo(({ allTags }: { allTags: string[] }) => {
                     enterKeyHint="search"
                     inputMode="search"
                     placeholder="Suchen..."
-                    value={filters.searchTerm}
-                    onChange={(e) => updateFilters({ searchTerm: e.target.value })}
+                    value={localSearch}
+                    onChange={handleSearchChange}
                     className="w-full pl-10 pr-4 py-2 bg-secondary/50 border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all appearance-none"
                     autoComplete="off"
                     autoCorrect="off"

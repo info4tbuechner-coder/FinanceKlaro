@@ -1,9 +1,6 @@
 import { useMemo } from 'react';
 import { useAppState } from '../context/AppContext';
 import { Transaction } from '../types';
-// Fix: Switched to direct submodule imports for date-fns to resolve module export errors.
-import { parseISO } from 'date-fns/parseISO';
-import { isWithinInterval } from 'date-fns/isWithinInterval';
 
 const useFilteredTransactions = (): Transaction[] => {
     const { transactions, filters, viewMode } = useAppState();
