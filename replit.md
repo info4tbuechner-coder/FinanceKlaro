@@ -11,6 +11,7 @@ Eine React/TypeScript Personal-Finance-App (PWA) gebaut mit Vite.
 - Projektverfolgung & Sparziele
 - Verbindlichkeiten-Verwaltung (Schulden/Darlehen)
 - Google Gemini KI-Belegscan (Kamera)
+- Replit Auth Login (Google, GitHub, E-Mail, Apple, X) via OpenID Connect
 - Internet Computer (ICP/DFINITY) Login-Integration
 - PWA mit Service Worker & Offline-Support
 - 5 Themes (Grandeur, Synthwave, Blockchain, Neon, Forest)
@@ -24,6 +25,9 @@ Eine React/TypeScript Personal-Finance-App (PWA) gebaut mit Vite.
 - **Styling**: Tailwind CSS v4 mit CSS Custom Properties Themes
 - **Charts**: Recharts (npm, kein CDN)
 - **AI**: Google Gemini API (@google/genai)
+- **Auth**: Replit Auth (OpenID Connect) via openid-client, passport, express-session, connect-pg-simple
+- **Backend**: Express + tsx (Auth-Server auf Port 5001, Vite-Proxy für /api/*)
+- **Database**: PostgreSQL (sessions + users Tabellen für Auth)
 - **Blockchain**: DFINITY/ICP agent, auth-client, candid, principal
 - **Date**: date-fns v4
 

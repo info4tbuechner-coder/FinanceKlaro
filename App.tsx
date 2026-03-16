@@ -7,7 +7,9 @@ import TransactionList from './components/TransactionList';
 import RightSidebar from './components/RightSidebar';
 import ModalManager from './components/modals/ModalManager';
 import SplashScreen from './components/SplashScreen';
-import { Plus, ScanLine, LayoutDashboard, Receipt, BarChart2, WifiOff } from 'lucide-react';
+import LoginPage from './components/LoginPage';
+import { useAuth } from './hooks/useAuth';
+import { Plus, ScanLine, LayoutDashboard, Receipt, BarChart2, WifiOff, LoaderCircle } from 'lucide-react';
 import { triggerHapticFeedback } from './utils';
 
 const OfflineNotice: React.FC = () => {
@@ -203,6 +205,20 @@ const App: React.FC = () => {
         sessionStorage.setItem('klaro_splash_shown', '1');
         setShowSplash(false);
     }, []);
+
+    const { isLoading, isAuthenticated } = useAuth();
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-background">
+                <LoaderCircle className="h-8 w-8 text-primary animate-spin" />
+            </div>
+        );
+    }
+
+    if (!isAuthenticated) {
+        return <LoginPage />;
+    }
 
     return (
         <AppProvider>

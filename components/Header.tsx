@@ -1,10 +1,11 @@
 
 import React, { useState, memo, useEffect } from 'react';
 import { useAppState, useAppDispatch, useUpcomingBills } from '../context/AppContext';
-import { Sun, Moon, BarChart2, Settings, Menu, X, Bot, Palette, FileDown, UploadCloud, Repeat, Gem, LoaderCircle, Bell, Eye, EyeOff, Smartphone, Landmark, Tags } from 'lucide-react';
+import { Sun, Moon, BarChart2, Settings, Menu, X, Bot, Palette, FileDown, UploadCloud, Repeat, Gem, LoaderCircle, Bell, Eye, EyeOff, Smartphone, Landmark, Tags, LogOut, User } from 'lucide-react';
 import type { Theme, ViewMode, ModalType, ICStatus } from '../types';
 import { triggerHapticFeedback } from '../utils';
 import { Button } from './ui';
+import { useAuth } from '../hooks/useAuth';
 
 const THEMES: { name: Theme; icon: React.ReactNode }[] = [
   { name: 'grandeur', icon: <Sun className="h-5 w-5" /> },
@@ -53,6 +54,46 @@ const NotificationBell = memo(() => {
         </button>
     );
 });
+
+const UserAvatar: React.FC = () => {
+    const { user, displayName } = useAuth();
+    const [open, setOpen] = useState(false);
+
+    if (!user) return null;
+
+    return (
+        <div className="relative">
+            <button
+                onClick={() => setOpen(o => !o)}
+                className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-secondary transition-colors"
+                title={displayName ?? undefined}
+            >
+                {user.profileImageUrl ? (
+                    <img src={user.profileImageUrl} alt={displayName ?? 'User'} className="h-7 w-7 rounded-full object-cover ring-2 ring-primary/30" />
+                ) : (
+                    <div className="h-7 w-7 rounded-full bg-primary/20 flex items-center justify-center">
+                        <User className="h-4 w-4 text-primary" />
+                    </div>
+                )}
+            </button>
+            {open && (
+                <div className="absolute right-0 mt-2 w-52 rounded-xl shadow-lg glass-card border border-border/20 z-50 animate-fade-in overflow-hidden">
+                    <div className="px-4 py-3 border-b border-border/20">
+                        <p className="font-bold text-sm text-foreground truncate">{displayName}</p>
+                        {user.email && <p className="text-xs text-muted-foreground truncate">{user.email}</p>}
+                    </div>
+                    <a
+                        href="/api/logout"
+                        className="flex items-center gap-2 w-full px-4 py-3 text-sm text-destructive hover:bg-secondary transition-colors"
+                    >
+                        <LogOut className="h-4 w-4" />
+                        Abmelden
+                    </a>
+                </div>
+            )}
+        </div>
+    );
+};
 
 const Header: React.FC = () => {
     const { theme, viewMode, icStatus, privacyMode } = useAppState();
@@ -161,6 +202,7 @@ const Header: React.FC = () => {
                                     </button>
                                 ))}
                             </ControlGroupContainer>
+                            <UserAvatar />
                         </div>
                     </div>
                     
@@ -186,6 +228,9 @@ const Header: React.FC = () => {
                             </button>
                         ))}
                     </div>
+                    <a href="/api/logout" className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-destructive text-sm font-medium border border-destructive/20 hover:bg-destructive/10 transition-colors">
+                        <LogOut className="h-4 w-4" /> Abmelden
+                    </a>
                 </div>
             )}
         </header>
