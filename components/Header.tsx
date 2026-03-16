@@ -1,7 +1,7 @@
 
 import React, { useState, memo, useEffect } from 'react';
 import { useAppState, useAppDispatch, useUpcomingBills } from '../context/AppContext';
-import { Sun, Moon, BarChart2, Settings, Menu, X, Bot, Palette, FileDown, UploadCloud, Repeat, Gem, LoaderCircle, Bell, Eye, EyeOff, Smartphone, Landmark } from 'lucide-react';
+import { Sun, Moon, BarChart2, Settings, Menu, X, Bot, Palette, FileDown, UploadCloud, Repeat, Gem, LoaderCircle, Bell, Eye, EyeOff, Smartphone, Landmark, Tags } from 'lucide-react';
 import type { Theme, ViewMode, ModalType, ICStatus } from '../types';
 import { triggerHapticFeedback } from '../utils';
 import { Button } from './ui';
@@ -136,7 +136,8 @@ const Header: React.FC = () => {
                                 </button>
                                 {isDropdownOpen && (
                                     <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg py-1 glass-card ring-1 ring-black ring-opacity-5 z-20 animate-fade-in">
-                                        <button onClick={() => { openModal({type: 'MANAGE_CATEGORIES'}); setIsDropdownOpen(false); }} className="w-full text-left block px-4 py-3 text-sm text-foreground hover:bg-secondary">Kategorien</button>
+                                        <button onClick={() => { openModal({type: 'MANAGE_CATEGORIES'}); setIsDropdownOpen(false); }} className="w-full text-left flex items-center px-4 py-3 text-sm text-foreground hover:bg-secondary">Kategorien</button>
+                                        <button onClick={() => { openModal({type: 'MANAGE_TAGS'}); setIsDropdownOpen(false); }} className="w-full text-left flex items-center px-4 py-3 text-sm text-foreground hover:bg-secondary"><Tags className="mr-2 h-4 w-4" /> Tags</button>
                                         <button onClick={() => { openModal({type: 'MANAGE_RECURRING'}); setIsDropdownOpen(false);}} className="w-full text-left block px-4 py-3 text-sm text-foreground hover:bg-secondary">Daueraufträge</button>
                                         <button onClick={() => { openModal({type: 'MANAGE_LIABILITIES'}); setIsDropdownOpen(false);}} className="w-full text-left block px-4 py-3 text-sm text-foreground hover:bg-secondary">Verbindlichkeiten</button>
                                         <div className="border-t border-border my-1"></div>

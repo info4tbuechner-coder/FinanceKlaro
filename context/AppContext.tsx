@@ -79,6 +79,7 @@ const initialState: AppState = {
     projects: sampleData.projects,
     recurringTransactions: sampleData.recurringTransactions,
     liabilities: sampleData.liabilities,
+    predefinedTags: ['privat', 'business', 'arbeit', 'familie', 'urlaub', 'gesundheit'],
     theme: 'grandeur',
     viewMode: 'all',
     filters: initialFilters,
@@ -124,7 +125,9 @@ type Action =
     | { type: 'SET_IC_PRINCIPAL'; payload: string | null }
     | { type: 'PAY_BILL'; payload: string }
     | { type: 'SET_ACTIVE_SIDEBAR_TAB'; payload: string }
-    | { type: 'TOGGLE_PRIVACY_MODE' };
+    | { type: 'TOGGLE_PRIVACY_MODE' }
+    | { type: 'ADD_PREDEFINED_TAG'; payload: string }
+    | { type: 'DELETE_PREDEFINED_TAG'; payload: string };
 
 
 const recalculateGoalAmounts = (transactions: Transaction[], goals: Goal[]): Goal[] => {
@@ -388,6 +391,14 @@ function appReducer(state: AppState, action: Action): AppState {
             const { theme, viewMode, filters, isSubscribed, privacyMode, ...dataToSync } = action.payload;
             return { ...state, ...dataToSync };
         }
+        case 'ADD_PREDEFINED_TAG': {
+            const tag = action.payload.trim().toLowerCase();
+            if (!tag || (state.predefinedTags || []).includes(tag)) return state;
+            return { ...state, predefinedTags: [...(state.predefinedTags || []), tag].sort() };
+        }
+        case 'DELETE_PREDEFINED_TAG': {
+            return { ...state, predefinedTags: (state.predefinedTags || []).filter(t => t !== action.payload) };
+        }
         default: return state;
     }
 }
@@ -414,7 +425,8 @@ export const useUpcomingBills = () => {
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [storedState, setStoredState] = useLocalStorage<AppState>('klaro-state', initialState);
-    const [state, dispatch] = useReducer(appReducer, storedState);
+    const mergedInitial: AppState = { ...initialState, ...storedState, predefinedTags: storedState.predefinedTags ?? initialState.predefinedTags };
+    const [state, dispatch] = useReducer(appReducer, mergedInitial);
 
     // Sync state to localStorage when it changes
     useEffect(() => {

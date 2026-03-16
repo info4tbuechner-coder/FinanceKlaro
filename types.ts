@@ -155,6 +155,7 @@ export type ModalType =
   | { type: 'SMART_SCAN' }
   | { type: 'MONTHLY_CHECK' }
   | { type: 'MANAGE_CATEGORIES' }
+  | { type: 'MANAGE_TAGS' }
   | { type: 'MANAGE_GOALS' }
   | { type: 'MANAGE_PROJECTS' }
   | { type: 'MANAGE_RECURRING' }
@@ -174,6 +175,7 @@ export interface AppState {
     projects: Project[];
     recurringTransactions: RecurringTransaction[];
     liabilities: Liability[];
+    predefinedTags: string[];
     theme: Theme;
     viewMode: ViewMode;
     filters: Filters;

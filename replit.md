@@ -15,6 +15,8 @@ Eine React/TypeScript Personal-Finance-App (PWA) gebaut mit Vite.
 - PWA mit Service Worker & Offline-Support
 - 5 Themes (Grandeur, Synthwave, Blockchain, Neon, Forest)
 - Privacy-Modus (Daten unscharf)
+- Kategorienverwaltung: Ausgaben- und Einnahmen-Kategorien, Budget pro Kategorie, Inline-Bearbeitung
+- Tag-System: Tags auf Transaktionen (Chip-UI, Autocomplete), vordefinierte Tags, Tag-Manager
 
 ## Tech Stack
 - **Frontend**: React 19, TypeScript
