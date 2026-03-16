@@ -112,6 +112,15 @@ const AppContent: React.FC = () => {
         return () => window.removeEventListener('appinstalled', handleAppInstalled);
     }, []);
 
+    // PWA Shortcut: ?action=add opens add transaction modal
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('action') === 'add') {
+            dispatch({ type: 'OPEN_MODAL', payload: { type: 'ADD_TRANSACTION' } });
+            window.history.replaceState({}, '', '/');
+        }
+    }, [dispatch]);
+
     // PWA App Badging API sync
     useEffect(() => {
         if ('setAppBadge' in navigator) {

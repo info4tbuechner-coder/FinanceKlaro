@@ -1,53 +1,60 @@
 {
-  "name": "Finance",
+  "name": "Klaro – Finanzverwaltung",
   "short_name": "Klaro",
   "description": "Sophisticierte, moderne Finanzverwaltung für Privatpersonen und Freelancer.",
-  "start_url": "./",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "display_override": [
-    "window-controls-overlay",
-    "minimal-ui"
-  ],
+  "display_override": ["window-controls-overlay", "minimal-ui"],
   "background_color": "#0a0a0a",
   "theme_color": "#2563eb",
   "orientation": "portrait",
-  "scope": "./",
-  "categories": [
-    "finance",
-    "productivity"
-  ],
-  "requestFramePermissions": [
-    "camera",
-    "microphone"
-  ],
+  "lang": "de",
+  "categories": ["finance", "productivity"],
   "icons": [
     {
-      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=klaro&backgroundColor=2563eb",
+      "src": "/icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=klaro&backgroundColor=2563eb",
+      "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Transaktion hinzufügen",
+      "short_name": "Neu",
+      "description": "Neue Transaktion erfassen",
+      "url": "/?action=add",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ],
   "screenshots": [
     {
-      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=screenshot1&backgroundColor=2563eb",
-      "sizes": "1080x1920",
-      "type": "image/svg+xml",
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "form_factor": "narrow",
       "label": "Klaro Dashboard"
-    },
-    {
-      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=screenshot2&backgroundColor=0f172a",
-      "sizes": "1920x1080",
-      "type": "image/svg+xml",
-      "form_factor": "wide",
-      "label": "Klaro Desktop Analyse"
     }
-  ]
+  ],
+  "prefer_related_applications": false
 }
