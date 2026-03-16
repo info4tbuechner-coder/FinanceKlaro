@@ -10,16 +10,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "@google/genai": "^1.16.0",
-    "date-fns": "^4.1.0",
-    "lucide-react": "^0.542.0",
-    "recharts": "^3.1.2",
     "@dfinity/agent": "1.4.0",
     "@dfinity/auth-client": "1.4.0",
     "@dfinity/candid": "1.4.0",
-    "@dfinity/principal": "1.4.0"
+    "@dfinity/principal": "1.4.0",
+    "@google/genai": "^1.16.0",
+    "@tailwindcss/vite": "^4.2.1",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.542.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "recharts": "^3.1.2",
+    "tailwindcss": "^4.2.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

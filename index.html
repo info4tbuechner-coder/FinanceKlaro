@@ -16,13 +16,9 @@
   
   <link rel="apple-touch-icon" href="https://api.dicebear.com/7.x/shapes/svg?seed=klaro&backgroundColor=2563eb">
   
-  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/recharts/umd/Recharts.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
   <style>
     :root {
       --font-sans: 'Inter', sans-serif;
@@ -42,10 +38,9 @@
       user-select: text;
       -webkit-appearance: none;
       appearance: none;
-      border-radius: 0; /* Reset iOS defaults */
+      border-radius: 0;
     }
     
-    /* Remove search input clear button on WebKit (we usually implement our own or rely on native type="search" properly) */
     input[type="search"]::-webkit-search-decoration,
     input[type="search"]::-webkit-search-cancel-button,
     input[type="search"]::-webkit-search-results-button,
@@ -53,7 +48,6 @@
       -webkit-appearance: none;
     }
 
-    /* Custom Scrollbar Hiding for App-Like Feel */
     .custom-scrollbar {
       scrollbar-width: none;
       -ms-overflow-style: none;
@@ -250,33 +244,21 @@
       animation: slide-up-sheet 0.4s cubic-bezier(0.32, 0.72, 0, 1) forwards;
     }
 
+    @keyframes scan-line {
+      0% { top: 30px; }
+      100% { top: calc(100% - 30px); }
+    }
+    .animate-scan-line {
+      animation: scan-line 2s ease-in-out infinite alternate;
+    }
+
     .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
     .pt-safe { padding-top: env(safe-area-inset-top); }
 
   </style>
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.1.1",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
-    "react/": "https://aistudiocdn.com/react@^19.1.1/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.16.0",
-    "date-fns/": "https://aistudiocdn.com/date-fns@^4.1.0/",
-    "date-fns": "https://aistudiocdn.com/date-fns@^4.1.0",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.542.0",
-    "recharts": "https://aistudiocdn.com/recharts@^3.1.2",
-    "@dfinity/agent": "https://cdn.jsdelivr.net/npm/@dfinity/agent@1.4.0/dist/esm/index.js",
-    "@dfinity/auth-client": "https://cdn.jsdelivr.net/npm/@dfinity/auth-client@1.4.0/dist/esm/index.js",
-    "@dfinity/candid": "https://cdn.jsdelivr.net/npm/@dfinity/candid@1.4.0/dist/esm/index.js",
-    "@dfinity/principal": "https://cdn.jsdelivr.net/npm/@dfinity/principal@1.4.0/dist/esm/index.js"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
 </head>
 <body class="antialiased">
   <div id="root"></div>
-  <script type="module" src="./index.tsx"></script>
-<script type="module" src="/index.tsx"></script>
+  <script type="module" src="/index.tsx"></script>
 </body>
 </html>

@@ -472,8 +472,8 @@ const AnalysisModal: React.FC = () => {
                 <p className="text-sm text-muted-foreground mt-1">Woher kommt mein Geld und wohin fließt es?</p>
             </div>
              {sankeyData.links.length > 0 ? (
-                <div style={{ width: '100%', height: 450 }} className="p-4 bg-secondary/10 rounded-3xl border border-border/20">
-                    <ResponsiveContainer>
+                <div className="p-4 bg-secondary/10 rounded-3xl border border-border/20">
+                    <ResponsiveContainer width="100%" height={450} debounce={1}>
                         <Sankey 
                             data={sankeyData} 
                             nodePadding={50} 

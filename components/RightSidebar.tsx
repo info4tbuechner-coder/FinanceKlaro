@@ -177,8 +177,8 @@ const MonthlyReport = memo(() => {
             <div>
                 <h4 className="font-semibold mb-2">Ausgaben nach Kategorie</h4>
                 {dataWithPercent.length > 0 ? (
-                    <div style={{ width: '100%', height: 200 }}>
-                        <ResponsiveContainer>
+                    <div>
+                        <ResponsiveContainer width="100%" height={200} debounce={1}>
                             <PieChart>
                                 <Pie data={dataWithPercent} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#8884d8" labelLine={false} onClick={handlePieClick}>
                                     {dataWithPercent.map((entry, index) => {
@@ -223,8 +223,8 @@ const CashflowAnalysis = memo(() => {
     return (
         <div>
             <h4 className="font-semibold mb-4">Cashflow der letzten 12 Monate</h4>
-             <div style={{ width: '100%', height: 250 }}>
-                <ResponsiveContainer>
+             <div>
+                <ResponsiveContainer width="100%" height={250} debounce={1}>
                     <ComposedChart data={cashflowData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border) / 0.5)" />
                         <XAxis dataKey="month" fontSize={12} tickLine={false} axisLine={false} />
@@ -251,8 +251,8 @@ const ProjectTracker = memo(() => {
                         <h4 className="font-semibold text-sm">{p.name}</h4>
                         <span className={`font-bold text-lg ${p.profit >= 0 ? 'text-success' : 'text-destructive'}`}>{formatCurrency(p.profit)}</span>
                     </div>
-                     <div style={{ width: '100%', height: 150 }}>
-                        <ResponsiveContainer>
+                     <div>
+                        <ResponsiveContainer width="100%" height={150} debounce={1}>
                             <BarChart data={p.data} layout="vertical" margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border) / 0.5)" />
                                 <XAxis type="number" tickFormatter={(value) => formatCurrency(value as number)} fontSize={12} />
