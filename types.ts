@@ -54,6 +54,8 @@ export interface Category {
   name: string;
   type: CategoryType;
   budget?: number;
+  icon?: string;
+  color?: string;
 }
 
 export interface Goal {
@@ -124,6 +126,8 @@ export interface ReportsData {
     budgetOverviewData: {
         id: string;
         name: string;
+        icon?: string;
+        color?: string;
         spent: number;
         budget: number;
         percentage: number;

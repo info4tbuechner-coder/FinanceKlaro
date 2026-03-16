@@ -28,6 +28,8 @@ const useReportsData = (): ReportsData => {
             return {
                 id: category.id,
                 name: category.name,
+                icon: category.icon,
+                color: category.color,
                 spent,
                 budget: category.budget || 0,
                 percentage: category.budget ? (spent / category.budget) * 100 : 0,

@@ -125,7 +125,10 @@ const BudgetOverview: React.FC = () => {
                             </div>
 
                             <div className="flex justify-between items-center mb-1">
-                                <h4 className="font-medium text-sm truncate pr-2">{item.name}</h4>
+                                <h4 className="font-medium text-sm truncate pr-2 flex items-center gap-1.5">
+                                    {item.icon && <span className="text-base leading-none">{item.icon}</span>}
+                                    {item.name}
+                                </h4>
                                 <div className={`flex items-center text-sm font-semibold ${isOverBudget ? 'text-destructive' : 'text-muted-foreground'}`}>
                                     {isOverBudget && <AlertCircle className="mr-1 h-4 w-4 animate-pulse-destructive" />}
                                     <span>{item.percentage.toFixed(0)}%</span>
@@ -134,8 +137,11 @@ const BudgetOverview: React.FC = () => {
 
                             <div className="w-full bg-secondary rounded-full h-2.5">
                                 <div
-                                    className={`${progressBarColor} h-2.5 rounded-full transition-all duration-500`}
-                                    style={{ width: `${percentageWidth}%` }}
+                                    className={`${isOverBudget ? 'bg-destructive' : ''} h-2.5 rounded-full transition-all duration-500`}
+                                    style={{
+                                        width: `${percentageWidth}%`,
+                                        ...(!isOverBudget && item.color ? { background: item.color } : {}),
+                                    }}
                                 ></div>
                             </div>
                             
@@ -159,6 +165,7 @@ const MonthlyReport = memo(() => {
     const totalExpenses = useMemo(() => expenseDataForPieChart.reduce((sum, item) => sum + item.value, 0), [expenseDataForPieChart]);
     const dataWithPercent = useMemo(() => expenseDataForPieChart.map(item => ({...item, percent: totalExpenses > 0 ? (item.value / totalExpenses) * 100 : 0})), [expenseDataForPieChart, totalExpenses]);
     const categoryNameToIdMap = useMemo(() => new Map(categories.map(c => [c.name, c.id])), [categories]);
+    const categoryNameToColorMap = useMemo(() => new Map(categories.map(c => [c.name, c.color || undefined])), [categories]);
 
     const handlePieClick = useCallback((data: any) => {
         const clickedCategoryId = categoryNameToIdMap.get(data.name);
@@ -189,7 +196,7 @@ const MonthlyReport = memo(() => {
                                         return (
                                             <Cell 
                                                 key={`cell-${index}`}
-                                                fill={COLORS[index % COLORS.length]}
+                                                fill={categoryNameToColorMap.get(entry.name) || COLORS[index % COLORS.length]}
                                                 style={{
                                                     cursor: 'pointer',
                                                     opacity: isAnyActive && !isActive ? 0.3 : 1,

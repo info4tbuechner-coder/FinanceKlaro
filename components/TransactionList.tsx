@@ -127,7 +127,8 @@ const FilterBar = memo(({ allTags }: { allTags: string[] }) => {
 const TransactionItem = memo(({ transaction, isSelected, toggleSelection }: { transaction: Transaction, isSelected: boolean, toggleSelection: (id: string) => void }) => {
     const dispatch = useAppDispatch();
     const { categories } = useAppState();
-    const categoryName = useMemo(() => categories.find(c => c.id === transaction.categoryId)?.name || 'Unkategorisiert', [categories, transaction.categoryId]);
+    const category = useMemo(() => categories.find(c => c.id === transaction.categoryId), [categories, transaction.categoryId]);
+    const categoryName = category?.name || 'Unkategorisiert';
 
     const handleEdit = useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
@@ -160,7 +161,15 @@ const TransactionItem = memo(({ transaction, isSelected, toggleSelection }: { tr
                 </div>
                 <div className="flex items-center justify-between mt-1">
                     <div className="flex items-center gap-2 overflow-hidden">
-                        <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground whitespace-nowrap">{categoryName}</span>
+                        <span className="flex items-center gap-1 whitespace-nowrap">
+                            {category?.icon && <span className="text-[11px] leading-none">{category.icon}</span>}
+                            <span
+                                className="text-[10px] uppercase font-bold tracking-wider"
+                                style={{ color: category?.color ? category.color + 'cc' : undefined }}
+                            >
+                                {categoryName}
+                            </span>
+                        </span>
                         {transaction.tags && transaction.tags.map(tag => (
                             <span key={tag} className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold uppercase truncate max-w-[80px]">{tag}</span>
                         ))}
