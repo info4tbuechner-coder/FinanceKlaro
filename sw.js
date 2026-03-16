@@ -1,4 +1,4 @@
-const CACHE_NAME = 'klaro-finance-v11';
+const CACHE_NAME = 'klaro-finance-v12';
 
 const STATIC_ASSETS = [
   '/',
@@ -13,14 +13,21 @@ const STATIC_ASSETS = [
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap',
 ];
 
-const API_PATTERN = /^https:\/\/generativelanguage\.googleapis\.com\//;
+const NEVER_CACHE_PATTERNS = [
+  /\/api\//,
+  /^https:\/\/generativelanguage\.googleapis\.com\//,
+];
+
 const FONT_PATTERN = /^https:\/\/fonts\.(googleapis|gstatic)\.com\//;
 const ICON_PATTERN = /^https:\/\/api\.dicebear\.com\//;
+
+function shouldNeverCache(url) {
+  return NEVER_CACHE_PATTERNS.some(p => p.test(url));
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[SW] Pre-caching static assets');
       return Promise.allSettled(
         STATIC_ASSETS.map(url =>
           cache.add(url).catch(err => console.warn(`[SW] Failed to cache ${url}:`, err))
@@ -37,7 +44,6 @@ self.addEventListener('activate', (event) => {
       Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
-            console.log('[SW] Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -51,11 +57,27 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = request.url;
 
-  // Gemini API: never cache
-  if (API_PATTERN.test(url)) return;
+  // Auth API & Gemini: never cache — always go to network
+  if (shouldNeverCache(url)) return;
 
-  // App shell + local assets: stale-while-revalidate
-  if (url.startsWith(self.location.origin) || ICON_PATTERN.test(url)) {
+  // Fonts & external static: cache-first (long-lived, never changes)
+  if (FONT_PATTERN.test(url) || ICON_PATTERN.test(url)) {
+    event.respondWith(
+      caches.match(request).then((cached) => {
+        if (cached) return cached;
+        return fetch(request).then((networkResponse) => {
+          if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque')) {
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, networkResponse.clone()));
+          }
+          return networkResponse;
+        }).catch(() => new Response('Network error', { status: 408 }));
+      })
+    );
+    return;
+  }
+
+  // App shell + local static assets: stale-while-revalidate
+  if (url.startsWith(self.location.origin)) {
     event.respondWith(
       caches.open(CACHE_NAME).then((cache) =>
         cache.match(request).then((cached) => {
@@ -73,17 +95,4 @@ self.addEventListener('fetch', (event) => {
     );
     return;
   }
-
-  // Fonts & external static: cache-first
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request).then((networkResponse) => {
-        if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque')) {
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, networkResponse.clone()));
-        }
-        return networkResponse;
-      }).catch(() => new Response('Network error', { status: 408 }));
-    })
-  );
 });

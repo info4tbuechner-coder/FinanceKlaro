@@ -1,6 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const LoginPage: React.FC = () => {
+    useEffect(() => {
+        const prev = document.body.style.backgroundColor;
+        document.body.style.backgroundColor = '#ffffff';
+        return () => { document.body.style.backgroundColor = prev; };
+    }, []);
+
     return (
         <div style={{ fontFamily: 'Inter, system-ui, sans-serif' }} className="min-h-screen flex flex-col lg:flex-row">
             <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%)', borderRight: '1px solid #e2e8f0' }}>

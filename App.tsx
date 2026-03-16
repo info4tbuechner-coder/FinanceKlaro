@@ -210,8 +210,8 @@ const App: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-background">
-                <LoaderCircle className="h-8 w-8 text-primary animate-spin" />
+            <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a0a0a' }}>
+                <LoaderCircle className="h-8 w-8 animate-spin" style={{ color: '#6366f1' }} />
             </div>
         );
     }
