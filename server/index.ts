@@ -1,5 +1,5 @@
 import http from "http";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 import express from "express";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 
@@ -8,7 +8,7 @@ app.use(express.json());
 app.get("/health", (_req, res) => res.json({ status: "ok", ts: Date.now() }));
 
 function freePort(port: number) {
-  try { execSync(`fuser -k ${port}/tcp 2>/dev/null`, { stdio: "ignore" }); } catch {}
+  try { execFileSync("fuser", ["-k", `${port}/tcp`], { stdio: "ignore" }); } catch {}
 }
 
 function listenWithRetry(server: http.Server, port: number, retries = 3): Promise<void> {
