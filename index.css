@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/* ── Splash / Fade-in Animation ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out both;
+}
+
 /* ── Privacy Mode ── */
 .privacy-mode [data-privacy] {
   filter: blur(7px);

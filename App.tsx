@@ -1,11 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { AppProvider, useAppState, useAppDispatch, useUpcomingBills } from './context/AppContext';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
 import TransactionList from './components/TransactionList';
 import RightSidebar from './components/RightSidebar';
 import ModalManager from './components/modals/ModalManager';
+import SplashScreen from './components/SplashScreen';
 import { Plus, ScanLine, LayoutDashboard, Receipt, BarChart2, WifiOff } from 'lucide-react';
 import { triggerHapticFeedback } from './utils';
 
@@ -197,8 +198,15 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
+    const [showSplash, setShowSplash] = useState(() => !sessionStorage.getItem('klaro_splash_shown'));
+    const handleSplashDone = useCallback(() => {
+        sessionStorage.setItem('klaro_splash_shown', '1');
+        setShowSplash(false);
+    }, []);
+
     return (
         <AppProvider>
+            {showSplash && <SplashScreen onDone={handleSplashDone} />}
             <AppContent />
         </AppProvider>
     );
